@@ -9,7 +9,7 @@ class KeyboardCategory {
 }
 
 const String spaceIcon = '__space__';
-const int defaultBoardMaxIcons = 10;
+const int defaultBoardMaxIcons = 4;
 const int maxRecommendationIcons = 6;
 
 const List<String> descriptiveIcons = [

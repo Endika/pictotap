@@ -1,9 +1,11 @@
 import 'dart:async';
+import 'dart:math' as math;
+import 'dart:typed_data';
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:pictotap/data/pictogram_data.dart';
-import 'package:pictotap/image_saver.dart';
+import 'package:pictotap/services/image_saver.dart';
 import 'package:pictotap/l10n/app_localizations.dart';
 import 'package:pictotap/utils/pictogram_utils.dart';
 import 'package:pictotap/widgets/board_empty_hint.dart';
@@ -28,7 +30,9 @@ class _PictoTapScreenState extends State<PictoTapScreen> {
 
   static const String _backgroundAssetPath =
       'assets/background/background.webp';
-  static const double _boardIconSize = 80;
+  static const double _boardIconSize = 110;
+  static const int _shareImageSize = 1080;
+  static const Color _backgroundFallback = Color(0xFFF5F0EB);
   static const Duration _animationDuration = Duration(milliseconds: 450);
 
   void _addIcon(String icon) {
@@ -110,11 +114,51 @@ class _PictoTapScreenState extends State<PictoTapScreen> {
           as RenderRepaintBoundary?;
       if (boundary == null) return;
 
-      final image = await boundary.toImage(pixelRatio: 3);
-      final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
-      if (byteData == null) return;
+      const int out = _shareImageSize;
+      final bSize = boundary.size;
+      final pixelRatio = out / math.min(bSize.width, bSize.height);
+      final rawImage = await boundary.toImage(pixelRatio: pixelRatio);
 
-      final pngBytes = byteData.buffer.asUint8List();
+      final srcW = rawImage.width;
+      final srcH = rawImage.height;
+      final rawBytes = await rawImage.toByteData(
+        format: ui.ImageByteFormat.rawStraightRgba,
+      );
+      if (rawBytes == null) return;
+      final srcPixels = rawBytes.buffer.asUint8List();
+
+      final cropSize = math.min(srcW, srcH);
+      final cropX = (srcW - cropSize) ~/ 2;
+      final cropY = (srcH - cropSize) ~/ 2;
+
+      final outPixels = Uint8List(out * out * 4);
+      for (var y = 0; y < out; y++) {
+        final sy = (cropY + y * cropSize ~/ out).clamp(0, srcH - 1);
+        for (var x = 0; x < out; x++) {
+          final sx = (cropX + x * cropSize ~/ out).clamp(0, srcW - 1);
+          final si = (sy * srcW + sx) * 4;
+          final di = (y * out + x) * 4;
+          outPixels[di] = srcPixels[si];
+          outPixels[di + 1] = srcPixels[si + 1];
+          outPixels[di + 2] = srcPixels[si + 2];
+          outPixels[di + 3] = srcPixels[si + 3];
+        }
+      }
+
+      final completer = Completer<ui.Image>();
+      ui.decodeImageFromPixels(
+        outPixels,
+        out,
+        out,
+        ui.PixelFormat.rgba8888,
+        completer.complete,
+      );
+      final outputImage = await completer.future;
+      final pngData =
+          await outputImage.toByteData(format: ui.ImageByteFormat.png);
+      if (pngData == null) return;
+
+      final pngBytes = pngData.buffer.asUint8List();
       final fileName =
           'pictotap-board-${DateTime.now().millisecondsSinceEpoch}.png';
       await saveAndShareImage(pngBytes, fileName, shareText);
@@ -223,30 +267,29 @@ class _PictoTapScreenState extends State<PictoTapScreen> {
         ),
         foregroundColor: Colors.white,
       ),
-      body: Stack(
+      body: Column(
         children: [
-          Positioned.fill(
-            child: Image.asset(
-              _backgroundAssetPath,
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) {
-                return Container(color: const Color(0xFFF5F0EB));
-              },
-            ),
-          ),
-          Positioned.fill(
-            child: Container(color: Colors.white.withAlpha(140)),
-          ),
-          Column(
-            children: [
-              Expanded(
-                child: GestureDetector(
-                  onTap: _toggleKeyboard,
-                  child: RepaintBoundary(
-                    key: _boardBoundaryKey,
-                    child: Container(
+          Expanded(
+            child: GestureDetector(
+              onTap: _toggleKeyboard,
+              child: RepaintBoundary(
+                key: _boardBoundaryKey,
+                child: Stack(
+                  children: [
+                    Positioned.fill(
+                      child: Image.asset(
+                        _backgroundAssetPath,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(color: _backgroundFallback);
+                        },
+                      ),
+                    ),
+                    Positioned.fill(
+                      child: Container(color: Colors.white.withAlpha(140)),
+                    ),
+                    SizedBox(
                       width: double.infinity,
-                      color: Colors.transparent,
                       child: _selectedIcons.isEmpty
                           ? Center(
                               child: BoardEmptyHint(
@@ -267,19 +310,19 @@ class _PictoTapScreenState extends State<PictoTapScreen> {
                               ),
                             ),
                     ),
-                  ),
+                  ],
                 ),
               ),
-              if (_isKeyboardVisible)
-                PictogramKeyboard(
-                  onIconSelected: _addIcon,
-                  onSpace: _addSpace,
-                  onBackspace: _removeLast,
-                  recommendations: buildRecommendations(_selectedIcons),
-                  showLimitBanner: _showLimitReachedBanner,
-                ),
-            ],
+            ),
           ),
+          if (_isKeyboardVisible)
+            PictogramKeyboard(
+              onIconSelected: _addIcon,
+              onSpace: _addSpace,
+              onBackspace: _removeLast,
+              recommendations: buildRecommendations(_selectedIcons),
+              showLimitBanner: _showLimitReachedBanner,
+            ),
         ],
       ),
       floatingActionButton: _isKeyboardVisible
