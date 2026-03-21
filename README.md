@@ -1,12 +1,28 @@
-# PictoTap
+<p align="center">
+  <img src="web/icons/Icon-192.png" alt="PictoTap" width="96" height="96">
+</p>
 
-A communication app for accessibility built with Flutter. PictoTap enables users to communicate using pictograms — ideal for people who express themselves more easily with visual symbols.
+<h1 align="center">PictoTap</h1>
+
+<p align="center">
+  A communication app for accessibility using pictograms.<br>
+  Built with Flutter for web, installable as a PWA.
+</p>
+
+<p align="center">
+  <a href="https://endika.github.io/pictotap"><strong>Live Demo</strong></a> ·
+  <a href="#features">Features</a> ·
+  <a href="#getting-started">Getting Started</a>
+</p>
+
+---
 
 ## Features
 
 - **Pictogram keyboard** with categorized icons (descriptive, people, prepositions, determiners, nouns, verbs)
 - **Visual board** to compose messages by selecting pictograms
 - **Share** the board as an image with text description
+- **Installable PWA** — add to home screen on Android and iOS
 - **Multi-language support**: English, Spanish, Catalan, Basque, French, Galician, Portuguese, Valencian
 - **Accessibility-focused** design with semantic labels for screen readers
 
