@@ -5,17 +5,32 @@
 <h1 align="center">PictoTap</h1>
 
 <p align="center">
-  A communication app for accessibility using pictograms.<br>
-  Built with Flutter for web, installable as a PWA.
+  Free and open-source communication app using pictograms.<br>
+  Built with Flutter for web, installable as a PWA on any device.
 </p>
 
 <p align="center">
   <a href="https://endika.github.io/pictotap"><strong>Live Demo</strong></a> ·
+  <a href="#why-pictotap">Why PictoTap?</a> ·
   <a href="#features">Features</a> ·
   <a href="#getting-started">Getting Started</a>
 </p>
 
 ---
+
+## About
+
+PictoTap is a free, safe, and accessible communication app designed for people with Autism Spectrum Disorder (ASD). Its goal is to provide an easy way to communicate through pictograms on any device — mobile, tablet, or computer.
+
+While originally designed for people with ASD, PictoTap can also be helpful for anyone with communication difficulties, including people with cerebral palsy or other conditions that affect speech.
+
+## Why PictoTap?
+
+Pictograms are universally easy to identify, making communication simple and intuitive.
+
+- **Education** — A practical tool for teachers to communicate with students and support classroom routines, which are essential for people with ASD.
+- **Social inclusion** — Helps people with communication difficulties participate more actively in everyday social interactions.
+- **Family** — Enables fluid communication at home and helps families reinforce routines and learning from the classroom.
 
 ## Features
 
@@ -72,6 +87,10 @@ lib/
 ├── image_saver_stub.dart         # Stub for unsupported platforms
 └── l10n/                         # Localization (ARB files)
 ```
+
+## Team
+
+This project was conceived and designed by **Leire Gerekaetxebarria** and **Irune Iglesias**, who envisioned a simple and effective communication tool for accessibility. Development by **Endika**.
 
 ## License
 
