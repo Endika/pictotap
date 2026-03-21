@@ -1,0 +1,11 @@
+{
+  "@@locale": "gl",
+  "appTitle": "PictoTap",
+  "limitReached": "Límite acadado",
+  "hintTapToOpen": "Toca aquí para abrir o teclado",
+  "hintSelectIcon": "Escolle un pictograma",
+  "shareFailed": "Non se puido compartir o taboleiro",
+  "shareBoard": "Compartir taboleiro",
+  "space": "Engadir espazo",
+  "backspace": "Borrar último pictograma"
+}

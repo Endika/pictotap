@@ -1,0 +1,11 @@
+{
+  "@@locale": "eu",
+  "appTitle": "PictoTap",
+  "limitReached": "Muga lortuta",
+  "hintTapToOpen": "Sakatu hemen teklatua irekitzeko",
+  "hintSelectIcon": "Aukeratu piktograma bat",
+  "shareFailed": "Ezin izan da arbela partekatu",
+  "shareBoard": "Arbela partekatu",
+  "space": "Tartea gehitu",
+  "backspace": "Azken piktograma ezabatu"
+}

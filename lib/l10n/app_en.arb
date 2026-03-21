@@ -1,0 +1,11 @@
+{
+  "@@locale": "en",
+  "appTitle": "PictoTap",
+  "limitReached": "Limit reached",
+  "hintTapToOpen": "Tap here to open the keyboard",
+  "hintSelectIcon": "Choose a pictogram",
+  "shareFailed": "Could not share the board",
+  "shareBoard": "Share board",
+  "space": "Add space",
+  "backspace": "Delete last pictogram"
+}

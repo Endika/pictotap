@@ -1,0 +1,11 @@
+{
+  "@@locale": "val",
+  "appTitle": "PictoTap",
+  "limitReached": "Límit assolit",
+  "hintTapToOpen": "Toca ací per obrir el teclat",
+  "hintSelectIcon": "Tria un pictograma",
+  "shareFailed": "No s'ha pogut compartir el tauler",
+  "shareBoard": "Compartir tauler",
+  "space": "Afegir espai",
+  "backspace": "Esborrar últim pictograma"
+}

@@ -1,0 +1,41 @@
+# Miscellaneous
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+.atom/
+.history
+.svn/
+
+# IDE
+*.iml
+*.ipr
+*.iws
+.idea/
+.vscode/
+.cursor/
+
+# Flutter/Dart
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+/build/
+/coverage/
+**/doc/api/
+
+# Generated localization (regenerated via flutter gen-l10n)
+lib/l10n/app_localizations.dart
+lib/l10n/app_localizations_*.dart
+
+# Symbolication & obfuscation
+app.*.symbols
+app.*.map.json
+
+# Platform build artifacts
+**/ios/Flutter/.last_build_id
+/android/app/debug
+/android/app/profile
+/android/app/release

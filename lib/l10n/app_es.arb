@@ -1,0 +1,11 @@
+{
+  "@@locale": "es",
+  "appTitle": "PictoTap",
+  "limitReached": "Límite alcanzado",
+  "hintTapToOpen": "Toca aquí para abrir el teclado",
+  "hintSelectIcon": "Elige un pictograma",
+  "shareFailed": "No se pudo compartir el tablero",
+  "shareBoard": "Compartir tablero",
+  "space": "Añadir espacio",
+  "backspace": "Borrar último pictograma"
+}
