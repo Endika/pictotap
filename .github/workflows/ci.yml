@@ -31,5 +31,14 @@ jobs:
       - name: Analyze
         run: flutter analyze
 
-      - name: Run tests
-        run: flutter test
+      - name: Run tests with coverage
+        run: flutter test --coverage
+
+      - name: Enforce coverage threshold
+        run: |
+          # Exclude generated l10n files from coverage report
+          awk 'BEGIN{s=0} /^SF:.*lib\/l10n\//{s=1} /^end_of_record/{if(s){s=0;next}} !s' coverage/lcov.info > coverage/lcov_filtered.info
+          COVERAGE=$(awk '/^LF:/{t+=substr($0,4)} /^LH:/{h+=substr($0,4)} END{if(t>0) printf "%.1f",h/t*100; else print "0"}' coverage/lcov_filtered.info)
+          echo "Coverage: ${COVERAGE}% (excluding generated l10n)"
+          THRESHOLD=75
+          awk "BEGIN{exit ($COVERAGE < $THRESHOLD) ? 1 : 0}" || { echo "::error::Coverage ${COVERAGE}% is below the ${THRESHOLD}% threshold"; exit 1; }
