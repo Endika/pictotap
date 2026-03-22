@@ -1,7 +1,7 @@
 name: pictotap
 description: A communication app for accessibility.
 publish_to: none
-version: 1.1.0
+version: 1.1.1
 homepage: https://endika.github.io/pictotap
 repository: https://github.com/endika/pictotap
 environment:

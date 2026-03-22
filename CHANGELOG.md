@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.1](https://github.com/Endika/pictotap/compare/pictotap-v1.1.0...pictotap-v1.1.1) (2026-03-22)
+
+
+### Performance Improvements
+
+* **ci:** remove redundant standalone CI run on push to main ([33f6f2b](https://github.com/Endika/pictotap/commit/33f6f2b8b9362f2d1d497faf76469a1f0d2814a4))
+
 ## [1.1.0](https://github.com/Endika/pictotap/compare/pictotap-v1.0.0...pictotap-v1.1.0) (2026-03-22)
 
 
