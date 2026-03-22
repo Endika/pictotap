@@ -2,12 +2,15 @@
     "name": "PictoTap",
     "short_name": "PictoTap",
     "start_url": ".",
+    "scope": ".",
+    "id": "/",
     "display": "standalone",
     "background_color": "#673AB7",
     "theme_color": "#673AB7",
     "description": "A communication app for accessibility using pictograms.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
+    "categories": ["education", "health", "accessibility"],
     "icons": [
         {
             "src": "icons/Icon-192.png",

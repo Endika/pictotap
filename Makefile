@@ -1,4 +1,4 @@
-.PHONY: help format format-check analyze pubget run-web clean test
+.PHONY: help format format-check analyze pubget run-web build-web clean test
 
 help:
 	@echo "Available targets:"
@@ -8,6 +8,7 @@ help:
 	@echo "  make test          - Run flutter test"
 	@echo "  make pubget        - Run flutter pub get"
 	@echo "  make run-web       - Run flutter run"
+	@echo "  make build-web     - Build web with offline-first PWA"
 	@echo "  make clean         - Run flutter clean"
 
 format:
@@ -27,6 +28,9 @@ pubget:
 
 run-web:
 	flutter run -d web-server --web-port=8080 --web-hostname=0.0.0.0
+
+build-web:
+	flutter build web --release --pwa-strategy=offline-first
 
 clean:
 	flutter clean
