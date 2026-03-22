@@ -1,13 +1,11 @@
 import 'dart:async';
-import 'dart:math' as math;
-import 'dart:typed_data';
-import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:pictotap/data/pictogram_data.dart';
-import 'package:pictotap/services/image_saver.dart';
 import 'package:pictotap/l10n/app_localizations.dart';
-import 'package:pictotap/utils/pictogram_utils.dart';
+import 'package:pictotap/models/board.dart';
+import 'package:pictotap/models/pictogram.dart';
+import 'package:pictotap/services/board_share_service.dart';
+import 'package:pictotap/services/recommendation_service.dart';
 import 'package:pictotap/widgets/board_empty_hint.dart';
 import 'package:pictotap/widgets/pictogram_icon.dart';
 import 'package:pictotap/widgets/pictogram_keyboard.dart';
@@ -20,7 +18,10 @@ class PictoTapScreen extends StatefulWidget {
 }
 
 class _PictoTapScreenState extends State<PictoTapScreen> {
-  final List<String> _selectedIcons = [];
+  final Board _board = Board();
+  final BoardShareService _shareService = const BoardShareService();
+  final RecommendationService _recommendations = const RecommendationService();
+
   bool _isKeyboardVisible = false;
   int? _lastAddedIndex;
   int? _lastRemovedIndex;
@@ -31,25 +32,27 @@ class _PictoTapScreenState extends State<PictoTapScreen> {
   static const String _backgroundAssetPath =
       'assets/background/background.webp';
   static const double _boardIconSize = 110;
-  static const int _shareImageSize = 1080;
   static const Color _backgroundFallback = Color(0xFFF5F0EB);
   static const Duration _animationDuration = Duration(milliseconds: 450);
 
-  void _addIcon(String icon) {
-    if (_selectedIcons.length >= defaultBoardMaxIcons) {
+  @override
+  void initState() {
+    super.initState();
+    _board.addListener(_onBoardChanged);
+  }
+
+  void _onBoardChanged() => setState(() {});
+
+  void _addIcon(String iconId) {
+    if (_board.isFull) {
       _showLimitReachedMessage();
       return;
     }
-    final newIndex = _selectedIcons.length;
-    final newLength = newIndex + 1;
-    setState(() {
-      _selectedIcons.add(icon);
-      _lastAddedIndex = newIndex;
-    });
+    final newIndex = _board.length;
+    final reachedLimit = _board.add(Pictogram.fromId(iconId));
+    setState(() => _lastAddedIndex = newIndex);
 
-    if (newLength == defaultBoardMaxIcons) {
-      _showLimitReachedMessage();
-    }
+    if (reachedLimit) _showLimitReachedMessage();
 
     Future.delayed(_animationDuration).then((_) {
       if (!mounted) return;
@@ -60,10 +63,9 @@ class _PictoTapScreenState extends State<PictoTapScreen> {
   }
 
   void _removeLast() {
-    if (_selectedIcons.isEmpty) return;
-    if (_lastRemovedIndex != null) return;
+    if (_board.isEmpty || _lastRemovedIndex != null) return;
 
-    final removedIndex = _selectedIcons.length - 1;
+    final removedIndex = _board.length - 1;
     setState(() {
       _lastAddedIndex = null;
       _lastRemovedIndex = removedIndex;
@@ -71,11 +73,10 @@ class _PictoTapScreenState extends State<PictoTapScreen> {
 
     Future.delayed(_animationDuration).then((_) {
       if (!mounted) return;
+      if (_lastRemovedIndex == removedIndex) {
+        _board.removeLast();
+      }
       setState(() {
-        if (_lastRemovedIndex == removedIndex &&
-            _selectedIcons.length > removedIndex) {
-          _selectedIcons.removeAt(removedIndex);
-        }
         if (_lastRemovedIndex == removedIndex) _lastRemovedIndex = null;
       });
     });
@@ -94,74 +95,26 @@ class _PictoTapScreenState extends State<PictoTapScreen> {
   @override
   void dispose() {
     _limitReachedTimer?.cancel();
+    _board.removeListener(_onBoardChanged);
+    _board.dispose();
     super.dispose();
   }
 
-  void _addSpace() => _addIcon(spaceIcon);
+  void _addSpace() => _addIcon(Pictogram.space.id);
 
   void _toggleKeyboard() =>
       setState(() => _isKeyboardVisible = !_isKeyboardVisible);
 
   Future<void> _share() async {
-    if (_selectedIcons.isEmpty) return;
+    if (_board.isEmpty) return;
 
     final l10n = AppLocalizations.of(context)!;
-    final shareText =
-        _selectedIcons.map((icon) => displayNameForIcon(icon)).join(' ');
 
     try {
       final boundary = _boardBoundaryKey.currentContext?.findRenderObject()
           as RenderRepaintBoundary?;
       if (boundary == null) return;
-
-      const int out = _shareImageSize;
-      final bSize = boundary.size;
-      final pixelRatio = out / math.min(bSize.width, bSize.height);
-      final rawImage = await boundary.toImage(pixelRatio: pixelRatio);
-
-      final srcW = rawImage.width;
-      final srcH = rawImage.height;
-      final rawBytes = await rawImage.toByteData(
-        format: ui.ImageByteFormat.rawStraightRgba,
-      );
-      if (rawBytes == null) return;
-      final srcPixels = rawBytes.buffer.asUint8List();
-
-      final cropSize = math.min(srcW, srcH);
-      final cropX = (srcW - cropSize) ~/ 2;
-      final cropY = (srcH - cropSize) ~/ 2;
-
-      final outPixels = Uint8List(out * out * 4);
-      for (var y = 0; y < out; y++) {
-        final sy = (cropY + y * cropSize ~/ out).clamp(0, srcH - 1);
-        for (var x = 0; x < out; x++) {
-          final sx = (cropX + x * cropSize ~/ out).clamp(0, srcW - 1);
-          final si = (sy * srcW + sx) * 4;
-          final di = (y * out + x) * 4;
-          outPixels[di] = srcPixels[si];
-          outPixels[di + 1] = srcPixels[si + 1];
-          outPixels[di + 2] = srcPixels[si + 2];
-          outPixels[di + 3] = srcPixels[si + 3];
-        }
-      }
-
-      final completer = Completer<ui.Image>();
-      ui.decodeImageFromPixels(
-        outPixels,
-        out,
-        out,
-        ui.PixelFormat.rgba8888,
-        completer.complete,
-      );
-      final outputImage = await completer.future;
-      final pngData =
-          await outputImage.toByteData(format: ui.ImageByteFormat.png);
-      if (pngData == null) return;
-
-      final pngBytes = pngData.buffer.asUint8List();
-      final fileName =
-          'pictotap-board-${DateTime.now().millisecondsSinceEpoch}.png';
-      await saveAndShareImage(pngBytes, fileName, shareText);
+      await _shareService.share(boundary, _board.shareText);
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -173,25 +126,25 @@ class _PictoTapScreenState extends State<PictoTapScreen> {
     }
   }
 
-  Widget _buildBoardIcon(String icon) {
-    if (icon == spaceIcon) {
+  Widget _buildBoardIcon(Pictogram pictogram) {
+    if (pictogram.isSpace) {
       return const SizedBox(
           width: _boardIconSize * 0.5, height: _boardIconSize);
     }
-    final name = displayNameForIcon(icon);
     return Semantics(
-      label: name,
+      label: pictogram.displayName,
       child: Padding(
         padding: const EdgeInsets.all(4.0),
-        child: isAssetIcon(icon)
-            ? PictogramIcon(icon: icon, size: _boardIconSize)
-            : Text(icon, style: const TextStyle(fontSize: _boardIconSize)),
+        child: pictogram.isAsset
+            ? PictogramIcon(icon: pictogram.id, size: _boardIconSize)
+            : Text(pictogram.id,
+                style: const TextStyle(fontSize: _boardIconSize)),
       ),
     );
   }
 
-  Widget _buildAnimatedIcon(int index, String icon) {
-    final iconWidget = _buildBoardIcon(icon);
+  Widget _buildAnimatedIcon(int index, Pictogram pictogram) {
+    final iconWidget = _buildBoardIcon(pictogram);
 
     if (_lastAddedIndex == index) {
       return TweenAnimationBuilder<double>(
@@ -235,6 +188,7 @@ class _PictoTapScreenState extends State<PictoTapScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final icons = _board.icons;
 
     return Scaffold(
       appBar: AppBar(
@@ -290,7 +244,7 @@ class _PictoTapScreenState extends State<PictoTapScreen> {
                     ),
                     SizedBox(
                       width: double.infinity,
-                      child: _selectedIcons.isEmpty
+                      child: icons.isEmpty
                           ? Center(
                               child: BoardEmptyHint(
                                 isKeyboardVisible: _isKeyboardVisible,
@@ -301,12 +255,10 @@ class _PictoTapScreenState extends State<PictoTapScreen> {
                               child: Wrap(
                                 alignment: WrapAlignment.center,
                                 crossAxisAlignment: WrapCrossAlignment.center,
-                                children: _selectedIcons
-                                    .asMap()
-                                    .entries
-                                    .map((e) =>
-                                        _buildAnimatedIcon(e.key, e.value))
-                                    .toList(),
+                                children: [
+                                  for (var i = 0; i < icons.length; i++)
+                                    _buildAnimatedIcon(i, icons[i]),
+                                ],
                               ),
                             ),
                     ),
@@ -320,7 +272,7 @@ class _PictoTapScreenState extends State<PictoTapScreen> {
               onIconSelected: _addIcon,
               onSpace: _addSpace,
               onBackspace: _removeLast,
-              recommendations: buildRecommendations(_selectedIcons),
+              recommendations: _recommendations.suggest(_board.iconIds),
               showLimitBanner: _showLimitReachedBanner,
             ),
         ],
