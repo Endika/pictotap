@@ -47,25 +47,40 @@ Pictograms are universally easy to identify, making communication simple and int
 ### Prerequisites
 
 - Flutter SDK >= 3.0.0
+- [lefthook](https://github.com/evilmartians/lefthook#install) (optional, for git hooks)
 
 ### Installation
 
 ```bash
-flutter pub get
-flutter gen-l10n
+make setup
 ```
+
+This installs dependencies and configures pre-commit hooks (format + analyze) and pre-push hooks (tests).
 
 ### Running
 
 ```bash
-flutter run
+make run-web
 ```
 
 ### Testing
 
 ```bash
-flutter test
+make test          # run all tests
+make coverage      # run tests and report coverage
 ```
+
+### Releasing
+
+Releases are managed automatically by [release-please](https://github.com/googleapis/release-please). Push to `main` using [Conventional Commits](https://www.conventionalcommits.org/) (`feat:`, `fix:`, `chore:`, etc.) and a release PR will be created with the version bump and changelog.
+
+### Rollback
+
+If a deploy breaks in production, rollback to any previous version from the **Actions** tab:
+
+1. Go to **Actions → Rollback → Run workflow**
+2. Enter a git ref (tag like `v1.0.0`, commit SHA, or branch)
+3. The previous version will be rebuilt and deployed to GitHub Pages
 
 ## Project Structure
 
