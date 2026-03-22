@@ -1,4 +1,4 @@
-.PHONY: help format format-check analyze pubget run clean test
+.PHONY: help format format-check analyze pubget run-web clean test
 
 help:
 	@echo "Available targets:"
