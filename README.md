@@ -20,13 +20,11 @@
 
 ## About
 
-PictoTap is a free, safe, and accessible communication app designed for people with Autism Spectrum Disorder (ASD). Its goal is to provide an easy way to communicate through pictograms on any device — mobile, tablet, or computer.
+PictoTap is a free pictogram communication app for people with Autism Spectrum Disorder (ASD). Its goal is to provide an easy way to communicate through pictograms on any device — mobile, tablet, or computer.
 
 While originally designed for people with ASD, PictoTap can also be helpful for anyone with communication difficulties, including people with cerebral palsy or other conditions that affect speech.
 
 ## Why PictoTap?
-
-Pictograms are universally easy to identify, making communication simple and intuitive.
 
 - **Education** — A practical tool for teachers to communicate with students and support classroom routines, which are essential for people with ASD.
 - **Social inclusion** — Helps people with communication difficulties participate more actively in everyday social interactions.
@@ -36,17 +34,17 @@ Pictograms are universally easy to identify, making communication simple and int
 
 - **Pictogram keyboard** with categorized icons (descriptive, people, prepositions, determiners, nouns, verbs)
 - **Visual board** to compose messages by selecting pictograms
-- **Smart recommendations** — contextual next-word suggestions based on communication patterns
+- **Next-pictogram suggestions** from a built-in word graph, based on the last pictogram
 - **Share** the board as a 1080×1080 image with text description
-- **Offline-first PWA** — works without internet after the first visit, installable on any device
-- **Multi-language support**: English, Spanish, Catalan, Basque, French, Galician, Portuguese, Valencian
-- **Accessibility-focused** design with semantic labels for screen readers
+- **Installable PWA** on any device (it needs a connection; it does not work offline)
+- **Interface in 8 languages**: English, Spanish, Catalan, Basque, French, Galician, Portuguese, Valencian. Pictogram labels are in Spanish in every language
+- **Screen-reader labels** on every pictogram (in Spanish, like the labels)
 
 ## Getting Started
 
 ### Prerequisites
 
-- Flutter SDK >= 3.0.0
+- Flutter SDK >= 3.38.4
 - [lefthook](https://github.com/evilmartians/lefthook#install) (optional, for git hooks)
 
 ### Installation
