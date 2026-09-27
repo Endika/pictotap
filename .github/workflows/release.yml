@@ -18,5 +18,7 @@ jobs:
     steps:
       - uses: googleapis/release-please-action@v5
         with:
+          # The PAT: a release PR opened with GITHUB_TOKEN never triggers CI.
+          token: ${{ secrets.RELEASE_PLEASE_TOKEN }}
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
